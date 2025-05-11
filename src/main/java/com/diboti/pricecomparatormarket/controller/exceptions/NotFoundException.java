@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class NotFoundException extends Exception{
-    public NotFoundException(Exception e) {
-        super(e.getMessage());
+    public NotFoundException(Class<?> entityClass, long id) {
+        super(entityClass.getSimpleName() + " with id " + id + " not found.");
     }
 }
