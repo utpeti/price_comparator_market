@@ -17,13 +17,13 @@ public class ProductServiceImpl implements ProductService {
     private ProductDao productDao;
 
     @Override
-    public Product existsProduct(long productId) {
+    public Product existsProduct(String productId) {
         Optional<Product> product = productDao.findById(productId);
         return product.orElse(null);
     }
 
     @Override
-    public Product getProduct(long productId) throws InvalidServiceOperationException {
+    public Product getProduct(String productId) throws InvalidServiceOperationException  {
         try {
             Optional<Product> product = productDao.findById(productId);
             if(product.isPresent()) {

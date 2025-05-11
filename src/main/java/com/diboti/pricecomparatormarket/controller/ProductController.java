@@ -23,7 +23,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ProductDetailDto getProductById(@PathVariable("id") Long id) throws NotFoundException {
+    public ProductDetailDto getProductById(@PathVariable("id") String id) throws NotFoundException {
         log.info("GET /api/v1/product/{} called", id);
 
         var product = productService.existsProduct(id);
