@@ -1,5 +1,6 @@
 package com.diboti.pricecomparatormarket.controller;
 
+import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
 import com.diboti.pricecomparatormarket.dto.incoming.ProductInCartDto;
 import com.diboti.pricecomparatormarket.dto.outgoing.OptimizedShoppingCartItem;
 import com.diboti.pricecomparatormarket.dto.outgoing.ProductWithStoreInfo;
@@ -28,12 +29,12 @@ public class ProductController {
 
     @PostMapping("/optimize")
     @ResponseStatus(HttpStatus.OK)
-    public List<OptimizedShoppingCartItem> optimizeShoppingCart(@RequestBody List<ProductInCartDto> shoppingCart) {
+    public List<OptimizedShoppingCartItem> optimizeShoppingCart(@RequestBody List<ProductInCartDto> shoppingCart) throws NotFoundException {
         log.info("POST /api/v1/optimize called with shoppingCart: {}", shoppingCart);
 
         List<OptimizedShoppingCartItem> optimizedItems = new ArrayList<>();
 
-        shoppingCart.forEach(productInCartDto -> {
+        for (ProductInCartDto productInCartDto : shoppingCart) {
             var currentProductName = productInCartDto.getName();
             try {
                 ProductWithStoreInfo productWithStore = productService.getCheapestProductWithStore(currentProductName);
@@ -46,14 +47,15 @@ public class ProductController {
                 item.setBrand(cheapestProduct.getBrand());
                 item.setQuantity(cheapestProduct.getQuantity());
                 item.setUnit(cheapestProduct.getUnit());
+                item.setCurrency(cheapestProduct.getCurrency());
                 item.setPrice(cheapestProduct.getPrice());
                 item.setStore(store);
 
                 optimizedItems.add(item);
             } catch (InvalidServiceOperationException e) {
-                //throw new NotFoundException(Product.class, currentProductName);
+                throw new NotFoundException(Product.class, currentProductName);
             }
-        });
+        }
 
         log.info("Optimized shopping cart: {}", optimizedItems);
         return optimizedItems;

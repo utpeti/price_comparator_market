@@ -77,22 +77,9 @@ public class ProductServiceImpl implements ProductService {
             if (minPrice.isPresent()) {
                 Price cheapestPrice = minPrice.get();
                 Product cheapestProduct = cheapestPrice.getProduct();
+                cheapestProduct.setPrice(cheapestPrice.getPrice());
 
-                Product productWithPrice = new Product();
-
-                productWithPrice.setId(cheapestProduct.getId());
-                productWithPrice.setName(cheapestProduct.getName());
-                productWithPrice.setCategory(cheapestProduct.getCategory());
-                productWithPrice.setBrand(cheapestProduct.getBrand());
-                productWithPrice.setQuantity(cheapestProduct.getQuantity());
-                productWithPrice.setUnit(cheapestProduct.getUnit());
-                productWithPrice.setCurrency(cheapestProduct.getCurrency());
-
-                productWithPrice.setPrice(cheapestPrice.getPrice());
-
-                String store = cheapestPrice.getStore();
-
-                return new ProductWithStoreInfo(productWithPrice, store);
+                return new ProductWithStoreInfo(cheapestProduct, cheapestPrice.getStore());
             } else {
                 throw new InvalidServiceOperationException("No prices found for products with name: " + productName);
             }
