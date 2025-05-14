@@ -11,7 +11,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString
 @Entity
-@Table(name = "kaufland")
+@Table(name = "products")
 public class Product extends BaseEntity {
     @Column(nullable = false)
     private String name;
