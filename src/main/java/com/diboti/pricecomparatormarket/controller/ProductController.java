@@ -1,24 +1,18 @@
 package com.diboti.pricecomparatormarket.controller;
 
 import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
-import com.diboti.pricecomparatormarket.dto.incoming.ProductInCartDto;
-import com.diboti.pricecomparatormarket.dto.outgoing.OptimizedShoppingCartItem;
-import com.diboti.pricecomparatormarket.dto.outgoing.ProductWithStoreInfo;
+import com.diboti.pricecomparatormarket.dto.outgoing.ProductDetailDto;
 import com.diboti.pricecomparatormarket.mapper.ProductMapper;
 import com.diboti.pricecomparatormarket.model.Product;
 import com.diboti.pricecomparatormarket.service.ProductService;
-import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/api/v1/product")
 public class ProductController {
 
     @Autowired
@@ -27,37 +21,17 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @PostMapping("/optimize")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public List<OptimizedShoppingCartItem> optimizeShoppingCart(@RequestBody List<ProductInCartDto> shoppingCart) throws NotFoundException {
-        log.info("POST /api/v1/optimize called with shoppingCart: {}", shoppingCart);
+    public ProductDetailDto getProductById(@PathVariable("id") String id) throws NotFoundException {
+        log.info("GET /api/v1/product/{} called", id);
 
-        List<OptimizedShoppingCartItem> optimizedItems = new ArrayList<>();
-
-        for (ProductInCartDto productInCartDto : shoppingCart) {
-            var currentProductName = productInCartDto.getName();
-            try {
-                ProductWithStoreInfo productWithStore = productService.getCheapestProductWithStore(currentProductName);
-                Product cheapestProduct = productWithStore.getProduct();
-                String store = productWithStore.getStore();
-
-                OptimizedShoppingCartItem item = new OptimizedShoppingCartItem();
-                item.setName(cheapestProduct.getName());
-                item.setCategory(cheapestProduct.getCategory());
-                item.setBrand(cheapestProduct.getBrand());
-                item.setQuantity(cheapestProduct.getQuantity());
-                item.setUnit(cheapestProduct.getUnit());
-                item.setCurrency(cheapestProduct.getCurrency());
-                item.setPrice(cheapestProduct.getPrice());
-                item.setStore(store);
-
-                optimizedItems.add(item);
-            } catch (InvalidServiceOperationException e) {
-                throw new NotFoundException(Product.class, currentProductName);
-            }
+        var product = productService.existsProduct(id);
+        if(product == null) {
+            log.error("Product with id: {} not found", id);
+            throw new NotFoundException(Product.class, id);
         }
 
-        log.info("Optimized shopping cart: {}", optimizedItems);
-        return optimizedItems;
+        return productMapper.modelToDetailDto(product);
     }
 }

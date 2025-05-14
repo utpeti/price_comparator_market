@@ -3,7 +3,6 @@ package com.diboti.pricecomparatormarket.model;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
-import lombok.Getter;
 
 import java.io.Serializable;
 
