@@ -1,12 +1,16 @@
 package com.diboti.pricecomparatormarket.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-public class Discount {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString
+@Entity
+@Table(name = "discounts")
+public class Discount extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
@@ -18,7 +22,7 @@ public class Discount {
     private String from_date;
 
     @Column(nullable = false)
-    private Double to_date;
+    private String to_date;
 
     @Column(nullable = false)
     private double percentage_of_discount;

@@ -1,7 +1,10 @@
 package com.diboti.pricecomparatormarket.service;
 
+import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
+
+import java.util.Collection;
 
 public interface ProductService {
     Product existsProduct(String productId);

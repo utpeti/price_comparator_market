@@ -14,5 +14,10 @@ abstract public class DiscountMapper {
     public abstract Collection<DiscountDetailDto> modelsToDetailDto(Iterable<Discount> discounts);
 
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "product_id", source = "product.id")
+    @Mapping(target = "store", source = "store")
+    @Mapping(target = "from_date", source = "from_date")
+    @Mapping(target = "to_date", source = "to_date")
+    @Mapping(target = "percentage_of_discount", source = "percentage_of_discount")
     public abstract DiscountDetailDto modelToDetailDto(Discount model);
 }
