@@ -14,4 +14,5 @@ public class DiscountDetailDto {
     String from_date;
     String to_date;
     String percentage_of_discount;
+    String added_on;
 }

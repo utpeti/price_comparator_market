@@ -26,4 +26,7 @@ public class Discount extends BaseEntity {
 
     @Column(nullable = false)
     private double percentage_of_discount;
+
+    @Column(nullable = false)
+    private String added_on;
 }

@@ -8,5 +8,5 @@ import java.util.Collection;
 public interface DiscountService {
     Collection<Discount> getProductsWithHighestDiscounts() throws InvalidServiceOperationException;
 
-    Collection<Discount> getTodayDiscounts() throws InvalidServiceOperationException;
+    Collection<Discount> getLatestDiscounts() throws InvalidServiceOperationException;
 }

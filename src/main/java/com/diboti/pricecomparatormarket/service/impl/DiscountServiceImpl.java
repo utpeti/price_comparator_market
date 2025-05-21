@@ -44,7 +44,22 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public Collection<Discount> getTodayDiscounts() throws InvalidServiceOperationException {
-        return null;
+    public Collection<Discount> getLatestDiscounts() throws InvalidServiceOperationException {
+        Collection<Discount> discounts;
+        try {
+            discounts = discountDao.findAll();
+        } catch (IllegalArgumentException e) {
+            throw new InvalidServiceOperationException("Could not get discounts", e);
+        }
+
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return discounts.stream().filter(d -> {
+                    LocalDate added_on = LocalDate.parse(d.getAdded_on(), formatter);
+                    LocalDate yesterday = LocalDate.now().minusDays(1);
+                    return !added_on.isBefore(yesterday);
+                }).sorted(Comparator.comparing(Discount::getPercentage_of_discount).reversed())
+                .toList();
     }
 }

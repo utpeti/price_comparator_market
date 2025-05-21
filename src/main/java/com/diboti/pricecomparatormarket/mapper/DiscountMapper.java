@@ -19,5 +19,6 @@ abstract public class DiscountMapper {
     @Mapping(target = "from_date", source = "from_date")
     @Mapping(target = "to_date", source = "to_date")
     @Mapping(target = "percentage_of_discount", source = "percentage_of_discount")
+    @Mapping(target = "added_on", source = "added_on")
     public abstract DiscountDetailDto modelToDetailDto(Discount model);
 }

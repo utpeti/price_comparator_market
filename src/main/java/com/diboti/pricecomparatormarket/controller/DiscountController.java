@@ -28,12 +28,27 @@ public class DiscountController {
 
     @GetMapping("/best")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<DiscountDetailDto> getProductById() throws NotFoundException {
+    public Collection<DiscountDetailDto> getBiggestDiscounts() throws NotFoundException {
         log.info("GET /api/v1/discounts/best called");
 
         Collection<Discount> products;
         try {
             products = discountService.getProductsWithHighestDiscounts();
+        } catch (InvalidServiceOperationException e) {
+            throw new NotFoundException(Product.class, "");
+        }
+
+        return discountMapper.modelsToDetailDto(products);
+    }
+
+    @GetMapping("/latest")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<DiscountDetailDto> getLatestDiscounts() throws NotFoundException {
+        log.info("GET /api/v1/discounts/latest called");
+
+        Collection<Discount> products;
+        try {
+            products = discountService.getLatestDiscounts();
         } catch (InvalidServiceOperationException e) {
             throw new NotFoundException(Product.class, "");
         }
