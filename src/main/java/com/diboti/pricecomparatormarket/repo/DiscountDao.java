@@ -11,4 +11,13 @@ import java.util.Collection;
 public interface DiscountDao extends JpaRepository<Discount, Long> {
     @Query("SELECT d FROM Discount d WHERE d.product.id = ?1")
     Collection<Discount> findAllByProductId(String productId);
+
+    @Query("SELECT d FROM Discount d WHERE d.product.id = ?1 AND d.store = ?2")
+    Collection<Discount> findAllByProductIdAndStore(String productId, String store);
+
+    @Query("SELECT d FROM Discount d WHERE d.product.id = ?1 AND d.product.category = ?2")
+    Collection<Discount> findAllByProductIdAndProductCategory(String productId, String productCategory);
+
+    @Query("SELECT d FROM Discount d WHERE d.product.id = ?1 AND d.product.brand = ?2")
+    Collection<Discount> findAllByProductIdAndBrand(String productId, String brand);
 }

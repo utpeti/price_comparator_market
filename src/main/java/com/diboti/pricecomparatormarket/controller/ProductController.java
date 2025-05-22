@@ -49,13 +49,13 @@ public class ProductController {
             Collection<Discount> discounts = new ArrayList<>();
             if(filters.containsKey("store")) {
                 prices = productService.getPricesByStore(id, filters.get("store"));
-                discounts = discountService.getProductsWithHighestDiscounts();
+                discounts = discountService.getDiscountsByProductIdAndStore(id, filters.get("store"));
             } else if(filters.containsKey("product_category")) {
                 prices = productService.getPricesByProductCategory(id, filters.get("product_category"));
-                discounts = discountService.getProductsWithHighestDiscounts();
+                discounts = discountService.getDiscountsByProductIdAndProductCategory(id, filters.get("product_category"));
             } else if(filters.containsKey("brand")) {
                 prices = productService.getPricesByBrand(id, filters.get("brand"));
-                discounts = discountService.getProductsWithHighestDiscounts();
+                discounts = discountService.getDiscountsByProductIdAndBrand(id, filters.get("brand"));
             } else {
                 throw new ServerErrorException(new Exception("Invalid filter parameter"));
             }

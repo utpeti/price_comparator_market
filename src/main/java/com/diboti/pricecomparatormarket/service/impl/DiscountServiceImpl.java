@@ -62,4 +62,31 @@ public class DiscountServiceImpl implements DiscountService {
                 }).sorted(Comparator.comparing(Discount::getPercentage_of_discount).reversed())
                 .toList();
     }
+
+    @Override
+    public Collection<Discount> getDiscountsByProductIdAndStore(String productId, String store) throws InvalidServiceOperationException {
+        try {
+            return discountDao.findAllByProductIdAndStore(productId, store);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidServiceOperationException("Could not get discounts", e);
+        }
+    }
+
+    @Override
+    public Collection<Discount> getDiscountsByProductIdAndProductCategory(String productId, String productCategory) throws InvalidServiceOperationException {
+        try {
+            return discountDao.findAllByProductIdAndProductCategory(productId, productCategory);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidServiceOperationException("Could not get discounts", e);
+        }
+    }
+
+    @Override
+    public Collection<Discount> getDiscountsByProductIdAndBrand(String productId, String brand) throws InvalidServiceOperationException {
+        try {
+            return discountDao.findAllByProductIdAndBrand(productId, brand);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidServiceOperationException("Could not get discounts", e);
+        }
+    }
 }
