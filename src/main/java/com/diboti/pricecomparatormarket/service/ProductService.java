@@ -1,10 +1,22 @@
 package com.diboti.pricecomparatormarket.service;
 
+import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Map;
 
 public interface ProductService {
     Product existsProduct(String productId);
 
     Product getProduct(String productId) throws InvalidServiceOperationException;
+
+    Collection<Map<LocalDate, Double>> getPricesByStore(String productId, String store) throws InvalidServiceOperationException;
+
+    Collection<Map<LocalDate, Double>> getPricesByProductCategory(String productId, String productCategory) throws InvalidServiceOperationException;
+
+    Collection<Map<LocalDate, Double>> getPricesByBrand(String productId, String brand) throws InvalidServiceOperationException;
 }
