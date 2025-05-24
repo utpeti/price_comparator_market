@@ -16,4 +16,7 @@ public class ProductAlert extends BaseEntityNumId {
 
     @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false)
+    private Double price;
 }

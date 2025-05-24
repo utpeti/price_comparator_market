@@ -77,7 +77,7 @@ public class ProductController {
 
         if (userData == null) {
             throw new ServerErrorException(new Exception("Invalid user data"));
-        } else if (userData.getEmail() == null) {
+        } else if (userData.getEmail() == null || userData.getPrice() == null) {
             throw new ServerErrorException(new Exception("Invalid user data"));
         }
 
@@ -88,7 +88,7 @@ public class ProductController {
         }
 
         try {
-            productService.setProductAlert(id, userData.getEmail());
+            productService.setProductAlert(id, userData.getEmail(), userData.getPrice());
         } catch (InvalidServiceOperationException e) {
             throw new RuntimeException(e);
         }
@@ -96,7 +96,7 @@ public class ProductController {
 
     @DeleteMapping("notify/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAlertOnProductPrice(@PathVariable("id") String id, @RequestBody UserDataDto userData) throws ServerErrorException, NotFoundException {
+    public void deleteAlertOnProductPrice(@PathVariable("id") Long id, @RequestBody UserDataDto userData) throws ServerErrorException, NotFoundException {
         log.info("DELETE /api/v1/product/notify/{} called", id);
 
         if (userData == null) {

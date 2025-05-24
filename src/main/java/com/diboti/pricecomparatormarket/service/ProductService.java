@@ -21,7 +21,9 @@ public interface ProductService {
 
     ProductAlert existsProductAlert(Long id);
 
-    void setProductAlert(String productId, String email) throws InvalidServiceOperationException;
+    void setProductAlert(String productId, String email, Double price) throws InvalidServiceOperationException;
 
     void deleteProductAlert(Long id) throws InvalidServiceOperationException;
+
+    void checkProductPriceChange();
 }
