@@ -1,14 +1,13 @@
 package com.diboti.pricecomparatormarket.service.impl;
 
-import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
-import com.diboti.pricecomparatormarket.repo.DiscountDao;
+import com.diboti.pricecomparatormarket.model.ProductAlert;
+import com.diboti.pricecomparatormarket.repo.ProductAlertDao;
 import com.diboti.pricecomparatormarket.repo.ProductDao;
 import com.diboti.pricecomparatormarket.service.ProductService;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -21,8 +20,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductDao productDao;
+
     @Autowired
-    private DiscountDao discountDao;
+    private ProductAlertDao productAlertDao;
 
     @Override
     public Product existsProduct(String productId) {
@@ -99,7 +99,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void setPriceAlert(String productId) throws InvalidServiceOperationException {
+    public ProductAlert existsProductAlert(Long id) {
+        Optional<ProductAlert> productAlert = productAlertDao.findById(id);
+        return productAlert.orElse(null);
+    }
 
+    @Override
+    public void setProductAlert(String productId, String email) throws InvalidServiceOperationException {
+        var productAlert = productAlertDao.findByProductIdAndEmail(productId, email);
+        if(productAlert != null) {
+            throw new InvalidServiceOperationException("Product with id: " + productId + " already has an alert with email: " + email);
+        }
+
+        var newProductAlert = new ProductAlert(productId, email);
+        productAlertDao.save(newProductAlert);
+    }
+
+    @Override
+    public void deleteProductAlert(Long id) throws InvalidServiceOperationException{
+        try {
+            productAlertDao.deleteById(id);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidServiceOperationException("Could not delete product alert with id: " + id);
+        }
     }
 }

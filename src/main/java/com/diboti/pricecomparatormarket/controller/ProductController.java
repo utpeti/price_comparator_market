@@ -2,8 +2,8 @@ package com.diboti.pricecomparatormarket.controller;
 
 import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
 import com.diboti.pricecomparatormarket.controller.exceptions.ServerErrorException;
+import com.diboti.pricecomparatormarket.dto.incoming.UserDataDto;
 import com.diboti.pricecomparatormarket.dto.outgoing.PriceHistoryDto;
-import com.diboti.pricecomparatormarket.dto.outgoing.ProductDetailDto;
 import com.diboti.pricecomparatormarket.mapper.ProductMapper;
 import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
@@ -71,8 +71,15 @@ public class ProductController {
     }
 
     @PostMapping("notify/{id}")
-    void notifyOnProductPrice(@PathVariable("id") String id) throws ServerErrorException, NotFoundException {
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    void alertOnProductPrice(@PathVariable("id") String id, @RequestBody UserDataDto userData) throws ServerErrorException, NotFoundException {
         log.info("GET /api/v1/product/notify/{} called", id);
+
+        if (userData == null) {
+            throw new ServerErrorException(new Exception("Invalid user data"));
+        } else if (userData.getEmail() == null) {
+            throw new ServerErrorException(new Exception("Invalid user data"));
+        }
 
         var product = productService.existsProduct(id);
         if (product == null) {
@@ -80,6 +87,28 @@ public class ProductController {
             throw new NotFoundException(Product.class, id);
         }
 
-        productService.setPriceAltert(id);
+        try {
+            productService.setProductAlert(id, userData.getEmail());
+        } catch (InvalidServiceOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @DeleteMapping("notify/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAlertOnProductPrice(@PathVariable("id") String id, @RequestBody UserDataDto userData) throws ServerErrorException, NotFoundException {
+        log.info("DELETE /api/v1/product/notify/{} called", id);
+
+        if (userData == null) {
+            throw new ServerErrorException(new Exception("Invalid user data"));
+        } else if (userData.getEmail() == null) {
+            throw new ServerErrorException(new Exception("Invalid user data"));
+        }
+
+        try {
+            productService.deleteProductAlert(id);
+        } catch (InvalidServiceOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
