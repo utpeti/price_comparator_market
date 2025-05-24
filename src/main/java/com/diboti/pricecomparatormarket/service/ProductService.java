@@ -19,4 +19,6 @@ public interface ProductService {
     Collection<Map<LocalDate, Double>> getPricesByProductCategory(String productId, String productCategory) throws InvalidServiceOperationException;
 
     Collection<Map<LocalDate, Double>> getPricesByBrand(String productId, String brand) throws InvalidServiceOperationException;
+
+    void setPriceAlert(String productId) throws InvalidServiceOperationException;
 }

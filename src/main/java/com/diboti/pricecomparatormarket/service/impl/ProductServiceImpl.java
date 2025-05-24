@@ -97,4 +97,9 @@ public class ProductServiceImpl implements ProductService {
             throw new InvalidServiceOperationException("Failed to get products with id: " + productId, e);
         }
     }
+
+    @Override
+    public void setPriceAlert(String productId) throws InvalidServiceOperationException {
+
+    }
 }

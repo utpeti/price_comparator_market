@@ -51,7 +51,7 @@ public class ProductController {
                 prices = productService.getPricesByStore(id, filters.get("store"));
                 discounts = discountService.getDiscountsByProductIdAndStore(id, filters.get("store"));
             } else if(filters.containsKey("product_category")) {
-                prices = productService.getPricesByProductCategory(id, filters.get("product_category"));
+                prices = productService.                                                                                        getPricesByProductCategory(id, filters.get("product_category"));
                 discounts = discountService.getDiscountsByProductIdAndProductCategory(id, filters.get("product_category"));
             } else if(filters.containsKey("brand")) {
                 prices = productService.getPricesByBrand(id, filters.get("brand"));
@@ -68,5 +68,18 @@ public class ProductController {
         } catch (InvalidServiceOperationException e) {
             throw new ServerErrorException(e);
         }
+    }
+
+    @PostMapping("notify/{id}")
+    void notifyOnProductPrice(@PathVariable("id") String id) throws ServerErrorException, NotFoundException {
+        log.info("GET /api/v1/product/notify/{} called", id);
+
+        var product = productService.existsProduct(id);
+        if (product == null) {
+            log.error("Product with id: {} not found", id);
+            throw new NotFoundException(Product.class, id);
+        }
+
+        productService.setPriceAltert(id);
     }
 }
