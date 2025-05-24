@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-public class DiscountDetailDto {
+public class ProductStandardMeasurementDto {
     String id;
-    String product_id;
-    String store;
-    String from_date;
-    String to_date;
-    String percentageOfDiscount;
-    String added_on;
+    String name;
+    String category;
+    String brand;
+    Double pricePerUnit;
+    String unit;
+    String currency;
 }

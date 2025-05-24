@@ -4,6 +4,7 @@ import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
 import com.diboti.pricecomparatormarket.controller.exceptions.ServerErrorException;
 import com.diboti.pricecomparatormarket.dto.incoming.UserDataDto;
 import com.diboti.pricecomparatormarket.dto.outgoing.PriceHistoryDto;
+import com.diboti.pricecomparatormarket.dto.outgoing.ProductStandardMeasurementDto;
 import com.diboti.pricecomparatormarket.mapper.ProductMapper;
 import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
@@ -24,14 +25,29 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
-
-    @Autowired
-    private ProductMapper productMapper;
-
     @Autowired
     private ProductService productService;
+
     @Autowired
     private DiscountService discountService;
+
+    @GetMapping("/{id}/alternatives")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<ProductStandardMeasurementDto> getAlternatives(@PathVariable("id") String id) throws InvalidServiceOperationException, NotFoundException {
+        log.info("GET /api/v1/product/{}/alternatives called", id);
+
+        var product = productService.existsProduct(id);
+        if (product == null) {
+            log.error("Product with id: {} not found", id);
+            throw new NotFoundException(Product.class, id);
+        }
+
+        var alternativeProducts = productService.getAlternativesById(id);
+
+        var standardizedAlternativeProducts = productService.calculateStandardMeasurement(alternativeProducts);
+
+        return standardizedAlternativeProducts;
+    }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -51,7 +67,7 @@ public class ProductController {
                 prices = productService.getPricesByStore(id, filters.get("store"));
                 discounts = discountService.getDiscountsByProductIdAndStore(id, filters.get("store"));
             } else if(filters.containsKey("product_category")) {
-                prices = productService.                                                                                        getPricesByProductCategory(id, filters.get("product_category"));
+                prices = productService.getPricesByProductCategory(id, filters.get("product_category"));
                 discounts = discountService.getDiscountsByProductIdAndProductCategory(id, filters.get("product_category"));
             } else if(filters.containsKey("brand")) {
                 prices = productService.getPricesByBrand(id, filters.get("brand"));
