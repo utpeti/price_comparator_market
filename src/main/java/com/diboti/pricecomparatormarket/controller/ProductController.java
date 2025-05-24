@@ -2,8 +2,8 @@ package com.diboti.pricecomparatormarket.controller;
 
 import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
 import com.diboti.pricecomparatormarket.controller.exceptions.ServerErrorException;
+import com.diboti.pricecomparatormarket.dto.incoming.UserDataDto;
 import com.diboti.pricecomparatormarket.dto.outgoing.PriceHistoryDto;
-import com.diboti.pricecomparatormarket.dto.outgoing.ProductDetailDto;
 import com.diboti.pricecomparatormarket.mapper.ProductMapper;
 import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
@@ -51,7 +51,7 @@ public class ProductController {
                 prices = productService.getPricesByStore(id, filters.get("store"));
                 discounts = discountService.getDiscountsByProductIdAndStore(id, filters.get("store"));
             } else if(filters.containsKey("product_category")) {
-                prices = productService.getPricesByProductCategory(id, filters.get("product_category"));
+                prices = productService.                                                                                        getPricesByProductCategory(id, filters.get("product_category"));
                 discounts = discountService.getDiscountsByProductIdAndProductCategory(id, filters.get("product_category"));
             } else if(filters.containsKey("brand")) {
                 prices = productService.getPricesByBrand(id, filters.get("brand"));
@@ -67,6 +67,48 @@ public class ProductController {
             return priceHistoryDto;
         } catch (InvalidServiceOperationException e) {
             throw new ServerErrorException(e);
+        }
+    }
+
+    @PostMapping("notify/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    void alertOnProductPrice(@PathVariable("id") String id, @RequestBody UserDataDto userData) throws ServerErrorException, NotFoundException {
+        log.info("GET /api/v1/product/notify/{} called", id);
+
+        if (userData == null) {
+            throw new ServerErrorException(new Exception("Invalid user data"));
+        } else if (userData.getEmail() == null || userData.getPrice() == null) {
+            throw new ServerErrorException(new Exception("Invalid user data"));
+        }
+
+        var product = productService.existsProduct(id);
+        if (product == null) {
+            log.error("Product with id: {} not found", id);
+            throw new NotFoundException(Product.class, id);
+        }
+
+        try {
+            productService.setProductAlert(id, userData.getEmail(), userData.getPrice());
+        } catch (InvalidServiceOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @DeleteMapping("notify/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAlertOnProductPrice(@PathVariable("id") Long id, @RequestBody UserDataDto userData) throws ServerErrorException, NotFoundException {
+        log.info("DELETE /api/v1/product/notify/{} called", id);
+
+        if (userData == null) {
+            throw new ServerErrorException(new Exception("Invalid user data"));
+        } else if (userData.getEmail() == null) {
+            throw new ServerErrorException(new Exception("Invalid user data"));
+        }
+
+        try {
+            productService.deleteProductAlert(id);
+        } catch (InvalidServiceOperationException e) {
+            throw new RuntimeException(e);
         }
     }
 }

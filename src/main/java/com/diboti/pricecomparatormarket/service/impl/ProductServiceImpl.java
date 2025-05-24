@@ -2,18 +2,21 @@ package com.diboti.pricecomparatormarket.service.impl;
 
 import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
+import com.diboti.pricecomparatormarket.model.ProductAlert;
 import com.diboti.pricecomparatormarket.repo.DiscountDao;
+import com.diboti.pricecomparatormarket.repo.ProductAlertDao;
 import com.diboti.pricecomparatormarket.repo.ProductDao;
 import com.diboti.pricecomparatormarket.service.ProductService;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -21,6 +24,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductDao productDao;
+
+    @Autowired
+    private ProductAlertDao productAlertDao;
+
     @Autowired
     private DiscountDao discountDao;
 
@@ -96,5 +103,56 @@ public class ProductServiceImpl implements ProductService {
         } catch (IllegalArgumentException e) {
             throw new InvalidServiceOperationException("Failed to get products with id: " + productId, e);
         }
+    }
+
+    @Override
+    public ProductAlert existsProductAlert(Long id) {
+        Optional<ProductAlert> productAlert = productAlertDao.findById(id);
+        return productAlert.orElse(null);
+    }
+
+    @Override
+    public void setProductAlert(String productId, String email, Double price) throws InvalidServiceOperationException {
+        var productAlert = productAlertDao.findByProductIdAndEmail(productId, email);
+        if(productAlert != null) {
+            throw new InvalidServiceOperationException("Product with id: " + productId + " already has an alert with email: " + email);
+        }
+
+        var newProductAlert = new ProductAlert(productId, email, price);
+        productAlertDao.save(newProductAlert);
+    }
+
+    @Override
+    public void deleteProductAlert(Long id) throws InvalidServiceOperationException{
+        try {
+            productAlertDao.deleteById(id);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidServiceOperationException("Could not delete product alert with id: " + id);
+        }
+    }
+
+    @Scheduled(fixedRate = 5, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
+    @Override
+    public void checkProductPriceChange() {
+        Collection<ProductAlert> productAlerts = productAlertDao.findAll();
+
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        productAlerts.forEach(productAlert -> {
+            var product = productDao.findById(productAlert.getProductId());
+            var discounts = discountDao.findAllByProductId(productAlert.getProductId());
+            var validDiscount = discounts.stream().filter(d -> {
+                LocalDate fromDate = LocalDate.parse(d.getFrom_date(), formatter);
+                LocalDate toDate = LocalDate.parse(d.getTo_date(), formatter);
+                return (fromDate.isBefore(today) || fromDate.isEqual(today)) ||
+                        (toDate.isAfter(today) || toDate.isEqual(today));
+            }).sorted(Comparator.comparing(Discount::getPercentage_of_discount).reversed()).toList().getFirst();
+
+            if(product.isPresent() && (((100 - validDiscount.getPercentage_of_discount()) * product.get().getPrice()
+                    / 100 < productAlert.getPrice()) || product.get().getPrice() < productAlert.getPrice())) {
+                System.out.println(product.get().getId() + ": send notification");
+            }
+        });
     }
 }
