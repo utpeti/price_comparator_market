@@ -1,12 +1,10 @@
 package com.diboti.pricecomparatormarket.dto.outgoing;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Value
+@Setter
 @NoArgsConstructor(force = true)
-@AllArgsConstructor
 public class ProductDetailDto {
     String id;
     String name;
