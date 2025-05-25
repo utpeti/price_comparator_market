@@ -13,7 +13,7 @@ import lombok.*;
 @Entity
 @Table(name = "alerts")
 public class ProductAlert extends BaseEntityNumId {
-    @Column(nullable = false)
+    @Column(name= "product_id", nullable = false)
     private String productId;
 
     @Column(nullable = false)
