@@ -1,9 +1,17 @@
 # Price Comparator - Market
 ### Korpos Botond
 
-The goal of this project was to build the backend for a "Price Comparator - Market" application. The system allows users to track price changes, find the best deals, and manage their shopping lists effectively.
+### Contents
 
-Tech Stack
+- [Tech Stack](#tech-stack)
+- [Project Structure Overview](#project-structure-overview)
+- [Build and Run Instructions](#build-and-run-instructions)
+- [Python Script to Convert CSV Files into Database Tables](#python-script-to-convert-csv-files-into-database-tables)
+- [Simplification](#simplification)
+- [How to Use the Implemented Features](#how-to-use-the-implemented-features)
+
+
+### Tech Stack
 Build tool: Gradle
 Framework: Spring Boot
 Database: MySQL
