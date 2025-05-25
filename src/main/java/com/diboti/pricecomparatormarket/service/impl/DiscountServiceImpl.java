@@ -1,7 +1,6 @@
 package com.diboti.pricecomparatormarket.service.impl;
 
 import com.diboti.pricecomparatormarket.model.Discount;
-import com.diboti.pricecomparatormarket.model.Product;
 import com.diboti.pricecomparatormarket.repo.DiscountDao;
 import com.diboti.pricecomparatormarket.repo.ProductDao;
 import com.diboti.pricecomparatormarket.service.DiscountService;
@@ -13,7 +12,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 
 @Service
 public class DiscountServiceImpl implements DiscountService {
@@ -36,11 +34,11 @@ public class DiscountServiceImpl implements DiscountService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         return discounts.stream().filter(d -> {
-            LocalDate fromDate = LocalDate.parse(d.getFrom_date(), formatter);
+            LocalDate fromDate = LocalDate.parse(d.getFromDate(), formatter);
             //LocalDate toDate = LocalDate.parse(d.getTo_date(), formatter);
-            return (fromDate.isBefore(today) || fromDate.isEqual(today)); //&&
+            return fromDate.isBefore(today) || fromDate.isEqual(today); //&&
             //(toDate.isAfter(today) || toDate.isEqual(today));
-        }).sorted(Comparator.comparing(Discount::getPercentage_of_discount).reversed()).toList();
+        }).sorted(Comparator.comparing(Discount::getPercentageOfDiscount).reversed()).toList();
     }
 
     @Override
@@ -52,19 +50,18 @@ public class DiscountServiceImpl implements DiscountService {
             throw new InvalidServiceOperationException("Could not get discounts", e);
         }
 
-        LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         return discounts.stream().filter(d -> {
-                    LocalDate added_on = LocalDate.parse(d.getAdded_on(), formatter);
-                    LocalDate yesterday = LocalDate.now().minusDays(1);
-                    return !added_on.isBefore(yesterday);
-                }).sorted(Comparator.comparing(Discount::getPercentage_of_discount).reversed())
-                .toList();
+            LocalDate addedOn = LocalDate.parse(d.getAddedOn(), formatter);
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            return !addedOn.isBefore(yesterday);
+        }).sorted(Comparator.comparing(Discount::getPercentageOfDiscount).reversed()).toList();
     }
 
     @Override
-    public Collection<Discount> getDiscountsByProductIdAndStore(String productId, String store) throws InvalidServiceOperationException {
+    public Collection<Discount> getDiscountsByProductIdAndStore(String productId, String store)
+            throws InvalidServiceOperationException {
         try {
             return discountDao.findAllByProductIdAndStore(productId, store);
         } catch (IllegalArgumentException e) {
@@ -73,7 +70,8 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public Collection<Discount> getDiscountsByProductIdAndProductCategory(String productId, String productCategory) throws InvalidServiceOperationException {
+    public Collection<Discount> getDiscountsByProductIdAndProductCategory(String productId, String productCategory)
+            throws InvalidServiceOperationException {
         try {
             return discountDao.findAllByProductIdAndProductCategory(productId, productCategory);
         } catch (IllegalArgumentException e) {
@@ -82,7 +80,8 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public Collection<Discount> getDiscountsByProductIdAndBrand(String productId, String brand) throws InvalidServiceOperationException {
+    public Collection<Discount> getDiscountsByProductIdAndBrand(String productId, String brand)
+            throws InvalidServiceOperationException {
         try {
             return discountDao.findAllByProductIdAndBrand(productId, brand);
         } catch (IllegalArgumentException e) {

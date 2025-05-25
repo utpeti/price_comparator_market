@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 import java.util.Collection;
 
 @Mapper(componentModel = "spring",
-unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
+        unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public abstract class ProductMapper {
 
     @IterableMapping(elementTargetType = ProductDetailDto.class)

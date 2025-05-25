@@ -10,9 +10,12 @@ public interface DiscountService {
 
     Collection<Discount> getLatestDiscounts() throws InvalidServiceOperationException;
 
-    Collection<Discount> getDiscountsByProductIdAndStore(String productId, String store) throws InvalidServiceOperationException;
+    Collection<Discount> getDiscountsByProductIdAndStore(String productId, String store)
+            throws InvalidServiceOperationException;
 
-    Collection<Discount> getDiscountsByProductIdAndProductCategory(String productId, String productCategory) throws InvalidServiceOperationException;
+    Collection<Discount> getDiscountsByProductIdAndProductCategory(String productId, String productCategory)
+            throws InvalidServiceOperationException;
 
-    Collection<Discount> getDiscountsByProductIdAndBrand(String productId, String brand) throws InvalidServiceOperationException;
+    Collection<Discount> getDiscountsByProductIdAndBrand(String productId, String brand)
+            throws InvalidServiceOperationException;
 }

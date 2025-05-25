@@ -14,15 +14,19 @@ public interface ProductService {
 
     Product getProduct(String productId) throws InvalidServiceOperationException;
 
-    Collection<Map<LocalDate, Double>> getPricesByStore(String productId, String store) throws InvalidServiceOperationException;
+    Collection<Map<LocalDate, Double>> getPricesByStore(String productId, String store)
+            throws InvalidServiceOperationException;
 
-    Collection<Map<LocalDate, Double>> getPricesByProductCategory(String productId, String productCategory) throws InvalidServiceOperationException;
+    Collection<Map<LocalDate, Double>> getPricesByProductCategory(String productId, String productCategory)
+            throws InvalidServiceOperationException;
 
-    Collection<Map<LocalDate, Double>> getPricesByBrand(String productId, String brand) throws InvalidServiceOperationException;
+    Collection<Map<LocalDate, Double>> getPricesByBrand(String productId, String brand)
+            throws InvalidServiceOperationException;
 
     ProductAlert existsProductAlert(Long id);
 
-    void setProductAlert(String productId, String email, Double price) throws InvalidServiceOperationException;
+    void setProductAlert(String productId, String email, Double price)
+            throws InvalidServiceOperationException;
 
     void deleteProductAlert(Long id) throws InvalidServiceOperationException;
 
@@ -30,5 +34,6 @@ public interface ProductService {
 
     Collection<Product> getAlternativesById(String productId) throws InvalidServiceOperationException;
 
-    Collection<ProductStandardMeasurementDto> calculateStandardMeasurement(Collection<Product> products) throws InvalidServiceOperationException;
+    Collection<ProductStandardMeasurementDto> calculateStandardMeasurement(Collection<Product> products)
+            throws InvalidServiceOperationException;
 }

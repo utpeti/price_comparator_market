@@ -19,14 +19,14 @@ public class Discount extends BaseEntity {
     private String store;
 
     @Column(nullable = false)
-    private String from_date;
+    private String fromDate;
 
     @Column(nullable = false)
-    private String to_date;
+    private String toDate;
 
     @Column(nullable = false)
-    private double percentage_of_discount;
+    private double percentageOfDiscount;
 
     @Column(nullable = false)
-    private String added_on;
+    private String addedOn;
 }
