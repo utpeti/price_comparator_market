@@ -44,9 +44,7 @@ public class ProductController {
 
         var alternativeProducts = productService.getAlternativesById(id);
 
-        var standardizedAlternativeProducts = productService.calculateStandardMeasurement(alternativeProducts);
-
-        return standardizedAlternativeProducts;
+        return productService.calculateStandardMeasurement(alternativeProducts);
     }
 
     @GetMapping("/{id}")
