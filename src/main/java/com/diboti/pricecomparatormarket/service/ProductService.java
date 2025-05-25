@@ -1,5 +1,6 @@
 package com.diboti.pricecomparatormarket.service;
 
+import com.diboti.pricecomparatormarket.dto.outgoing.ProductStandardMeasurementDto;
 import com.diboti.pricecomparatormarket.model.Product;
 import com.diboti.pricecomparatormarket.model.ProductAlert;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
@@ -26,4 +27,8 @@ public interface ProductService {
     void deleteProductAlert(Long id) throws InvalidServiceOperationException;
 
     void checkProductPriceChange();
+
+    Collection<Product> getAlternativesById(String productId) throws InvalidServiceOperationException;
+
+    Collection<ProductStandardMeasurementDto> calculateStandardMeasurement(Collection<Product> products) throws InvalidServiceOperationException;
 }

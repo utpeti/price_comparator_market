@@ -1,5 +1,6 @@
 package com.diboti.pricecomparatormarket.service.impl;
 
+import com.diboti.pricecomparatormarket.dto.outgoing.ProductStandardMeasurementDto;
 import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
 import com.diboti.pricecomparatormarket.model.ProductAlert;
@@ -10,6 +11,7 @@ import com.diboti.pricecomparatormarket.service.ProductService;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -149,10 +152,67 @@ public class ProductServiceImpl implements ProductService {
                         (toDate.isAfter(today) || toDate.isEqual(today));
             }).sorted(Comparator.comparing(Discount::getPercentage_of_discount).reversed()).toList().getFirst();
 
-            if(product.isPresent() && (((100 - validDiscount.getPercentage_of_discount()) * product.get().getPrice()
-                    / 100 < productAlert.getPrice()) || product.get().getPrice() < productAlert.getPrice())) {
-                System.out.println(product.get().getId() + ": send notification");
+            if(product.isPresent()) {
+                Collection<Map<LocalDate, Double>> prices = new ArrayList<>(List.of());
+                productDao.getPricesByProductId(product.get().getId()).forEach(row -> {
+                    Double price1 = (Double) row[0];
+                    LocalDate date = LocalDate.parse((String) row[1], formatter);
+
+                    prices.add(Map.of(date, price1));
+                });
+
+                var price = prices.stream()
+                        .max(Comparator.comparing(map -> map.keySet().iterator().next()))
+                        .map(map -> map.values().iterator().next())
+                        .orElseThrow();
+
+                if ((((100 - validDiscount.getPercentage_of_discount()) * price
+                        / 100 < productAlert.getPrice()) || price < productAlert.getPrice())) {
+                    System.out.println(product.get().getId() + ": send notification");
+                }
             }
         });
+    }
+
+    @Override
+    public Collection<Product> getAlternativesById(String productId) throws InvalidServiceOperationException {
+        var product = productDao.findById(productId);
+        if(product.isEmpty()) {
+            throw new InvalidServiceOperationException("Could not find product with id: " + productId);
+        }
+
+        return productDao.findAllByName(product.get().getName()).stream().filter(product1 -> !Objects.equals(product1.getId(), productId)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<ProductStandardMeasurementDto> calculateStandardMeasurement(Collection<Product> products) throws InvalidServiceOperationException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Collection<ProductStandardMeasurementDto> productStandardMeasurementDtos = new ArrayList<>(List.of());
+        products.forEach(product -> {
+            if(Objects.equals(product.getUnit(), "ml")) {
+                product.setUnit("l");
+                product.setQuantity(product.getQuantity() / 1000);
+            } else if (Objects.equals(product.getUnit(), "g")) {
+                product.setUnit("kg");
+                product.setQuantity(product.getQuantity() / 1000);
+            }
+
+            Collection<Map<LocalDate, Double>> prices = new ArrayList<>(List.of());
+            productDao.getPricesByProductId(product.getId()).forEach(row -> {
+                Double price1 = (Double) row[0];
+                LocalDate date = LocalDate.parse((String) row[1], formatter);
+
+                prices.add(Map.of(date, price1));
+            });
+
+            var price = prices.stream()
+                    .max(Comparator.comparing(map -> map.keySet().iterator().next()))
+                    .map(map -> map.values().iterator().next())
+                    .orElseThrow();
+
+            productStandardMeasurementDtos.add(new ProductStandardMeasurementDto(product.getId(), product.getName(), product.getCategory(), product.getBrand(), price / product.getQuantity(), product.getUnit(), product.getCurrency()));
+        });
+        return productStandardMeasurementDtos;
     }
 }
