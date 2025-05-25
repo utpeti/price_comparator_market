@@ -6,7 +6,6 @@
 - [Tech Stack](#tech-stack)
 - [Project Structure Overview](#project-structure-overview)
 - [Build and Run Instructions](#build-and-run-instructions)
-- [Python Script to Convert CSV Files into Database Tables](#python-script-to-convert-csv-files-into-database-tables)
 - [Simplification](#simplification)
 - [How to Use the Implemented Features](#how-to-use-the-implemented-features)
 
