@@ -3,11 +3,9 @@ package com.diboti.pricecomparatormarket.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ToString
 @Entity
 @Table(name = "discounts")
 public class Discount extends BaseEntity {

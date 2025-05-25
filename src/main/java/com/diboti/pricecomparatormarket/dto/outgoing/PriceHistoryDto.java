@@ -1,7 +1,9 @@
 package com.diboti.pricecomparatormarket.dto.outgoing;
 
 import com.diboti.pricecomparatormarket.model.Discount;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Collection;

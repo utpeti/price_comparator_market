@@ -2,7 +2,7 @@ package com.diboti.pricecomparatormarket.service.impl;
 
 import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.repo.DiscountDao;
-import com.diboti.pricecomparatormarket.repo.ProductDao;
+import com.diboti.pricecomparatormarket.repo.exceptions.InvalidDataAccessException;
 import com.diboti.pricecomparatormarket.service.DiscountService;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class DiscountServiceImpl implements DiscountService {
             throws InvalidServiceOperationException {
         try {
             return discountDao.findAllByProductIdAndStore(productId, store);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidDataAccessException e) {
             throw new InvalidServiceOperationException("Could not get discounts", e);
         }
     }
@@ -71,7 +71,7 @@ public class DiscountServiceImpl implements DiscountService {
             throws InvalidServiceOperationException {
         try {
             return discountDao.findAllByProductIdAndProductCategory(productId, productCategory);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidDataAccessException e) {
             throw new InvalidServiceOperationException("Could not get discounts", e);
         }
     }
@@ -81,7 +81,7 @@ public class DiscountServiceImpl implements DiscountService {
             throws InvalidServiceOperationException {
         try {
             return discountDao.findAllByProductIdAndBrand(productId, brand);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidDataAccessException e) {
             throw new InvalidServiceOperationException("Could not get discounts", e);
         }
     }

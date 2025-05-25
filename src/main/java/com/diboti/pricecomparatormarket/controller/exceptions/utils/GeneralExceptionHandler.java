@@ -6,13 +6,12 @@ import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
 import com.diboti.pricecomparatormarket.controller.exceptions.ServerErrorException;
 import com.diboti.pricecomparatormarket.dto.outgoing.ErrorDto;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GeneralExceptionHandler {
@@ -55,7 +54,7 @@ public class GeneralExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public final ErrorDto handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
         String errorMessage = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getDefaultMessage())
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .findFirst()
                 .orElse("Invalid input");
         return new ErrorDto(HttpStatus.BAD_REQUEST, errorMessage);

@@ -3,9 +3,12 @@ package com.diboti.pricecomparatormarket.controller;
 import com.diboti.pricecomparatormarket.controller.exceptions.InvalidFilterException;
 import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
 import com.diboti.pricecomparatormarket.controller.exceptions.ServerErrorException;
+import com.diboti.pricecomparatormarket.dto.incoming.ProductInCartDto;
 import com.diboti.pricecomparatormarket.dto.incoming.UserDataDto;
+import com.diboti.pricecomparatormarket.dto.outgoing.OptimizedCartStoreDto;
 import com.diboti.pricecomparatormarket.dto.outgoing.PriceHistoryDto;
 import com.diboti.pricecomparatormarket.dto.outgoing.ProductStandardMeasurementDto;
+import com.diboti.pricecomparatormarket.mapper.ProductMapper;
 import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
 import com.diboti.pricecomparatormarket.model.ProductAlert;
@@ -19,8 +22,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @RestController
@@ -31,6 +37,8 @@ public class ProductController {
 
     @Autowired
     private DiscountService discountService;
+    @Autowired
+    private ProductMapper productMapper;
 
     @GetMapping("/{id}/alternatives")
     @ResponseStatus(HttpStatus.OK)
@@ -126,5 +134,41 @@ public class ProductController {
         } catch (InvalidServiceOperationException e) {
             throw new ServerErrorException(e);
         }
+    }
+
+    @PostMapping("/optimize")
+    @ResponseStatus(HttpStatus.OK)
+    public List<OptimizedCartStoreDto> optimizeShoppingCart(@Valid @RequestBody List<ProductInCartDto> shoppingCart)
+            throws NotFoundException, ServerErrorException {
+        log.info("POST /api/v1/optimize called with shoppingCart: {}", shoppingCart);
+
+        Map<String, List<String>> storeProductsMap = new ConcurrentHashMap<>();
+
+        for (ProductInCartDto productInCartDto : shoppingCart) {
+            var id = productInCartDto.getId();
+            var product = productService.existsProduct(id);
+            if (product == null) {
+                log.error("Product with id: {} not found", id);
+                throw new NotFoundException(ProductAlert.class, id);
+            }
+
+            try {
+                var store = productService.getWhereIsTheCheapest(id);
+                storeProductsMap.computeIfAbsent(store, k -> new ArrayList<>()).add(id);
+            } catch (InvalidServiceOperationException e) {
+                throw new ServerErrorException(e);
+            }
+        }
+
+        List<OptimizedCartStoreDto> optimizedItems = new ArrayList<>();
+        for (Map.Entry<String, List<String>> entry : storeProductsMap.entrySet()) {
+            OptimizedCartStoreDto storeDto = new OptimizedCartStoreDto();
+            storeDto.setStore(entry.getKey());
+            storeDto.setProductIds(entry.getValue());
+            optimizedItems.add(storeDto);
+        }
+
+        log.info("Optimized shopping cart: {}", optimizedItems);
+        return optimizedItems;
     }
 }

@@ -2,12 +2,8 @@ package com.diboti.pricecomparatormarket.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @Data
-@EqualsAndHashCode
-@ToString
 @Entity
 @Table(name = "prices")
 public class Price {
@@ -25,6 +21,6 @@ public class Price {
     @Column(nullable = false)
     private String date;
 
-    @Column(nullable = false)
+    @Column(name = "price", nullable = false)
     private Double value;
 }

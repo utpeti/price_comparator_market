@@ -30,10 +30,12 @@ public interface ProductService {
 
     void deleteProductAlert(Long id) throws InvalidServiceOperationException;
 
-    void checkProductPriceChange();
+    void checkProductPriceChange() throws InvalidServiceOperationException;
 
     Collection<Product> getAlternativesById(String productId) throws InvalidServiceOperationException;
 
     Collection<ProductStandardMeasurementDto> calculateStandardMeasurement(Collection<Product> products)
             throws InvalidServiceOperationException;
+
+    String getWhereIsTheCheapest(String productId) throws InvalidServiceOperationException;
 }
