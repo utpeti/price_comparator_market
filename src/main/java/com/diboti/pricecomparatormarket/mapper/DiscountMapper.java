@@ -9,16 +9,16 @@ import org.mapstruct.Mapping;
 import java.util.Collection;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
-abstract public class DiscountMapper {
+public abstract class DiscountMapper {
     @IterableMapping(elementTargetType = DiscountDetailDto.class)
     public abstract Collection<DiscountDetailDto> modelsToDetailDto(Iterable<Discount> discounts);
 
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "product_id", source = "product.id")
+    @Mapping(target = "productId", source = "product.id")
     @Mapping(target = "store", source = "store")
-    @Mapping(target = "from_date", source = "from_date")
-    @Mapping(target = "to_date", source = "to_date")
-    @Mapping(target = "percentageOfDiscount", source = "percentage_of_discount")
-    @Mapping(target = "added_on", source = "added_on")
+    @Mapping(target = "fromDate", source = "fromDate")
+    @Mapping(target = "toDate", source = "toDate")
+    @Mapping(target = "percentageOfDiscount", source = "percentageOfDiscount")
+    @Mapping(target = "addedOn", source = "addedOn")
     public abstract DiscountDetailDto modelToDetailDto(Discount model);
 }

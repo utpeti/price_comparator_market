@@ -1,5 +1,3 @@
-// Ez a példa statikus kódellenőrzők használatát mutatja be.
-
 buildscript {
     repositories {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }

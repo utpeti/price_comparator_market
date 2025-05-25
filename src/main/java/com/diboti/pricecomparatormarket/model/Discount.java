@@ -3,11 +3,9 @@ package com.diboti.pricecomparatormarket.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ToString
 @Entity
 @Table(name = "discounts")
 public class Discount extends BaseEntity {
@@ -18,15 +16,15 @@ public class Discount extends BaseEntity {
     @Column(nullable = false)
     private String store;
 
-    @Column(nullable = false)
-    private String from_date;
+    @Column(name = "from_date", nullable = false)
+    private String fromDate;
 
-    @Column(nullable = false)
-    private String to_date;
+    @Column(name = "to_date", nullable = false)
+    private String toDate;
 
-    @Column(nullable = false)
-    private double percentage_of_discount;
+    @Column(name = "percentage_of_discount", nullable = false)
+    private double percentageOfDiscount;
 
-    @Column(nullable = false)
-    private String added_on;
+    @Column(name = "added_on", nullable = false)
+    private String addedOn;
 }

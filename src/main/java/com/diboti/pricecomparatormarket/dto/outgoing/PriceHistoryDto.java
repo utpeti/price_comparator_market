@@ -10,8 +10,8 @@ import java.util.Collection;
 import java.util.Map;
 
 @Data
-@NoArgsConstructor(force = true)
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class PriceHistoryDto {
     Collection<Map<LocalDate, Double>> prices;
     Collection<Discount> discounts;

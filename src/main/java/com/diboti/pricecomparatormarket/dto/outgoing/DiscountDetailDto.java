@@ -5,14 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor(force = true)
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class DiscountDetailDto {
     String id;
-    String product_id;
+    String productId;
     String store;
-    String from_date;
-    String to_date;
+    String fromDate;
+    String toDate;
     String percentageOfDiscount;
-    String added_on;
+    String addedOn;
 }

@@ -3,11 +3,10 @@ package com.diboti.pricecomparatormarket.dto.outgoing;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 
 @Data
-@NoArgsConstructor(force = true)
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class ProductDetailDto {
     String id;
     String name;
