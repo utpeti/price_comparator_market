@@ -7,9 +7,8 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
 
-@Value
-@Setter
-@NoArgsConstructor(force=true)
+@Data
+@NoArgsConstructor(force = true)
 public class PriceHistoryDto {
     Collection<Map<LocalDate, Double>> prices;
     Collection<Discount> discounts;

@@ -1,10 +1,9 @@
 package com.diboti.pricecomparatormarket.controller;
 
-import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
+import com.diboti.pricecomparatormarket.controller.exceptions.ServerErrorException;
 import com.diboti.pricecomparatormarket.dto.outgoing.DiscountDetailDto;
 import com.diboti.pricecomparatormarket.mapper.DiscountMapper;
 import com.diboti.pricecomparatormarket.model.Discount;
-import com.diboti.pricecomparatormarket.model.Product;
 import com.diboti.pricecomparatormarket.service.DiscountService;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,14 +28,14 @@ public class DiscountController {
 
     @GetMapping("/best")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<DiscountDetailDto> getBiggestDiscounts() throws NotFoundException {
+    public Collection<DiscountDetailDto> getBiggestDiscounts() throws ServerErrorException {
         log.info("GET /api/v1/discounts/best called");
 
         Collection<Discount> products;
         try {
             products = discountService.getProductsWithHighestDiscounts();
         } catch (InvalidServiceOperationException e) {
-            throw new NotFoundException(Product.class, "");
+            throw new ServerErrorException(e);
         }
 
         return discountMapper.modelsToDetailDto(products);
@@ -44,14 +43,14 @@ public class DiscountController {
 
     @GetMapping("/latest")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<DiscountDetailDto> getLatestDiscounts() throws NotFoundException {
+    public Collection<DiscountDetailDto> getLatestDiscounts() throws ServerErrorException {
         log.info("GET /api/v1/discounts/latest called");
 
         Collection<Discount> products;
         try {
             products = discountService.getLatestDiscounts();
         } catch (InvalidServiceOperationException e) {
-            throw new NotFoundException(Product.class, "");
+            throw new ServerErrorException(e);
         }
 
         return discountMapper.modelsToDetailDto(products);

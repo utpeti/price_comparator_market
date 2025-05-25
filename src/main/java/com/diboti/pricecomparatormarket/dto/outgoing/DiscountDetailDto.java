@@ -2,9 +2,8 @@ package com.diboti.pricecomparatormarket.dto.outgoing;
 
 import lombok.*;
 
-@Value
-@Setter
-@NoArgsConstructor(force=true)
+@Data
+@NoArgsConstructor(force = true)
 public class DiscountDetailDto {
     String id;
     String productId;
