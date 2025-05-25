@@ -1,6 +1,7 @@
 package com.diboti.pricecomparatormarket.controller.exceptions.utils;
 
 import com.diboti.pricecomparatormarket.controller.exceptions.BadRequestException;
+import com.diboti.pricecomparatormarket.controller.exceptions.InvalidFilterException;
 import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
 import com.diboti.pricecomparatormarket.controller.exceptions.ServerErrorException;
 import com.diboti.pricecomparatormarket.dto.outgoing.ErrorDto;
@@ -23,6 +24,12 @@ public class GeneralExceptionHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public final ErrorDto handleInvalidFilterException(InvalidFilterException e) {
+        return new ErrorDto(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public final ErrorDto handleNotFound(NotFoundException e) {
         return new ErrorDto(HttpStatus.NOT_FOUND, e.getMessage());
@@ -36,17 +43,22 @@ public class GeneralExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public final Iterable<String> handleConstraintViolation(ConstraintViolationException e) {
-        return e.getConstraintViolations().stream()
-                .map(it -> it.getPropertyPath().toString() + " " + it.getMessage())
-                .collect(Collectors.toList());
+    public final ErrorDto handleConstraintViolation(ConstraintViolationException e) {
+        String errorMessage = e.getConstraintViolations().stream()
+                .map(violation -> violation.getPropertyPath() + " " + violation.getMessage())
+                .findFirst()
+                .orElse("Invalid input");
+        return new ErrorDto(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public final Iterable<String> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        return e.getBindingResult().getFieldErrors().stream()
-                .map(it -> it.getField() + " " + it.getDefaultMessage())
-                .collect(Collectors.toList());
+    public final ErrorDto handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .findFirst()
+                .orElse("Invalid input");
+        return new ErrorDto(HttpStatus.BAD_REQUEST, errorMessage);
     }
+
 }

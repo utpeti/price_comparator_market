@@ -195,34 +195,38 @@ public class ProductServiceImpl implements ProductService {
             throws InvalidServiceOperationException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        Collection<ProductStandardMeasurementDto> productStandardMeasurementDtos = new ArrayList<>(List.of());
-        products.forEach(product -> {
-            if (Objects.equals(product.getUnit(), "ml")) {
-                product.setUnit("l");
-                product.setQuantity(product.getQuantity() / 1000);
-            } else if (Objects.equals(product.getUnit(), "g")) {
-                product.setUnit("kg");
-                product.setQuantity(product.getQuantity() / 1000);
-            }
+        try {
+            Collection<ProductStandardMeasurementDto> productStandardMeasurementDtos = new ArrayList<>(List.of());
+            products.forEach(product -> {
+                if (Objects.equals(product.getUnit(), "ml")) {
+                    product.setUnit("l");
+                    product.setQuantity(product.getQuantity() / 1000);
+                } else if (Objects.equals(product.getUnit(), "g")) {
+                    product.setUnit("kg");
+                    product.setQuantity(product.getQuantity() / 1000);
+                }
 
-            Collection<Map<LocalDate, Double>> prices = new ArrayList<>(List.of());
-            productDao.getPricesByProductId(product.getId()).forEach(row -> {
-                Double price1 = (Double) row[0];
-                LocalDate date = LocalDate.parse((String) row[1], formatter);
+                Collection<Map<LocalDate, Double>> prices = new ArrayList<>(List.of());
+                productDao.getPricesByProductId(product.getId()).forEach(row -> {
+                    Double price1 = (Double) row[0];
+                    LocalDate date = LocalDate.parse((String) row[1], formatter);
 
-                prices.add(Map.of(date, price1));
+                    prices.add(Map.of(date, price1));
+                });
+
+                var price = prices.stream()
+                        .max(Comparator.comparing(map -> map.keySet().iterator().next()))
+                        .map(map -> map.values().iterator().next())
+                        .orElseThrow();
+
+                productStandardMeasurementDtos
+                        .add(new ProductStandardMeasurementDto(product.getId(), product.getName(),
+                                product.getCategory(), product.getBrand(), price / product.getQuantity(),
+                                product.getUnit(), product.getCurrency()));
             });
-
-            var price = prices.stream()
-                    .max(Comparator.comparing(map -> map.keySet().iterator().next()))
-                    .map(map -> map.values().iterator().next())
-                    .orElseThrow();
-
-            productStandardMeasurementDtos
-                    .add(new ProductStandardMeasurementDto(product.getId(), product.getName(),
-                            product.getCategory(), product.getBrand(), price / product.getQuantity(),
-                            product.getUnit(), product.getCurrency()));
-        });
-        return productStandardMeasurementDtos;
+            return productStandardMeasurementDtos;
+        } catch (IllegalArgumentException e) {
+            throw new InvalidServiceOperationException("Failed to calculate standard measurement", e);
+        }
     }
 }

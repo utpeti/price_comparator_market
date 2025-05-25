@@ -25,6 +25,6 @@ public class Price {
     @Column(nullable = false)
     private String date;
 
-    @Column(name = "price", nullable = false)
+    @Column(nullable = false)
     private Double value;
 }

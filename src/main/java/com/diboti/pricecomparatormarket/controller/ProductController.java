@@ -1,6 +1,6 @@
 package com.diboti.pricecomparatormarket.controller;
 
-import com.diboti.pricecomparatormarket.controller.exceptions.BadRequestException;
+import com.diboti.pricecomparatormarket.controller.exceptions.InvalidFilterException;
 import com.diboti.pricecomparatormarket.controller.exceptions.NotFoundException;
 import com.diboti.pricecomparatormarket.controller.exceptions.ServerErrorException;
 import com.diboti.pricecomparatormarket.dto.incoming.UserDataDto;
@@ -8,9 +8,11 @@ import com.diboti.pricecomparatormarket.dto.outgoing.PriceHistoryDto;
 import com.diboti.pricecomparatormarket.dto.outgoing.ProductStandardMeasurementDto;
 import com.diboti.pricecomparatormarket.model.Discount;
 import com.diboti.pricecomparatormarket.model.Product;
+import com.diboti.pricecomparatormarket.model.ProductAlert;
 import com.diboti.pricecomparatormarket.service.DiscountService;
 import com.diboti.pricecomparatormarket.service.ProductService;
 import com.diboti.pricecomparatormarket.service.exceptions.InvalidServiceOperationException;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,7 +52,7 @@ public class ProductController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public PriceHistoryDto getProductById(@PathVariable("id") String id, @RequestParam Map<String, String> filters)
-            throws NotFoundException, ServerErrorException, BadRequestException {
+            throws NotFoundException, ServerErrorException, InvalidFilterException {
         log.info("GET /api/v1/product/{} called", id);
 
         var product = productService.existsProduct(id);
@@ -73,7 +75,7 @@ public class ProductController {
                 prices = productService.getPricesByBrand(id, filters.get("brand"));
                 discounts = discountService.getDiscountsByProductIdAndBrand(id, filters.get("brand"));
             } else {
-                throw new BadRequestException(new Exception());
+                throw new InvalidFilterException("Invalid filter(s) provided");
             }
 
             PriceHistoryDto priceHistoryDto = new PriceHistoryDto();
@@ -88,15 +90,9 @@ public class ProductController {
 
     @PostMapping("notify/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void alertOnProductPrice(@PathVariable("id") String id, @RequestBody UserDataDto userData)
+    void alertOnProductPrice(@PathVariable("id") String id, @Valid @RequestBody UserDataDto userData)
             throws ServerErrorException, NotFoundException {
         log.info("GET /api/v1/product/notify/{} called", id);
-
-        if (userData == null) {
-            throw new ServerErrorException(new Exception("Invalid user data"));
-        } else if (userData.getEmail() == null || userData.getPrice() == null) {
-            throw new ServerErrorException(new Exception("Invalid user data"));
-        }
 
         var product = productService.existsProduct(id);
         if (product == null) {
@@ -113,14 +109,16 @@ public class ProductController {
 
     @DeleteMapping("notify/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAlertOnProductPrice(@PathVariable("id") Long id, @RequestBody UserDataDto userData)
-            throws ServerErrorException {
+    public void deleteAlertOnProductPrice(@PathVariable("id") Long id, @Valid @RequestBody UserDataDto userData)
+            throws ServerErrorException, NotFoundException {
         log.info("DELETE /api/v1/product/notify/{} called", id);
 
-        if (userData == null) {
-            throw new ServerErrorException(new Exception("Invalid user data"));
-        } else if (userData.getEmail() == null) {
-            throw new ServerErrorException(new Exception("Invalid user data"));
+        log.info("User: {}", userData); //check if user data valid and exists in db
+
+        var productAlert = productService.existsProductAlert(id);
+        if (productAlert == null) {
+            log.error("Product alert with id: {} not found", id);
+            throw new NotFoundException(ProductAlert.class, id.toString());
         }
 
         try {

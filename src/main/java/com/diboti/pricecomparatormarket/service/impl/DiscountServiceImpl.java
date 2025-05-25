@@ -16,9 +16,6 @@ import java.util.Comparator;
 @Service
 public class DiscountServiceImpl implements DiscountService {
     @Autowired
-    private ProductDao productDao;
-
-    @Autowired
     private DiscountDao discountDao;
 
     @Override
